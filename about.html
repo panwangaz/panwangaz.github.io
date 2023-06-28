@@ -1,0 +1,124 @@
+---
+layout: page
+title: "About"
+description: "Hey, this is Kevin"
+header-img: "img/green-bg.jpg"
+---
+
+<!-- Language Selector -->
+<!-- <select class="sel-lang" onchange= "onLanChange(this.options[this.options.selectedIndex].value)">
+    <option value="0" selected> 中文 Chinese </option>
+    <option value="1"> 英文 English </option>
+</select> -->
+
+<!-- Chinese Version -->
+<div class="zh post-container">
+
+    <!--copied from markdown -->
+    <blockquote><p>生锈的不可逆过程，与人的回忆相似</br>
+    一旦开始追索,便发现不可能见到真正的原貌</p></blockquote>
+
+    <p>Halo，见字如面，这是<strong>kevin</strong>，一个大学僧，目前正在字节跳动担任计算机视觉算法实习生</p>
+
+    <p>Blog 本来打算用来记录下余下的大学生活，最后就沦落到记录日常学习以及所遇到问题的解决方案了。
+        很后悔没有早点写博客，不然上过的课，走过的坑，都可以在这里写下来。
+    做技术的人，如果一个月甚至一个星期不去碰代码的话就会十分生疏，以前我是不相信这句话的，因为以前接触到的技术十分有限，现在看得多了，也便觉得确实是这个道理，层出不穷的技术栈，
+    一段时间不去温习的话就真的跟没学过一样了，所以好记性不如烂笔头，为了节省以后复习的成本，就将想记的东西记下来吧。在未来的某一天如果看到自己曾经写的沙雕文章，嘲讽一波：”写的什么几把玩意儿？“ 倒也是件不错的事情。</p>
+
+    <p>页面基于 GitHub Pages 和 Jekyll 搭建，没有做任何的 SEO 优化，目前站点应该只能被 Google 收录，因此茫茫网络，如果你有幸发现我的文章，并且我的文章能够帮助到你，我将会十分开心 :D</p>
+
+    <!-- <p>下面是我的微信公众号，可以赏个脸关注一下</p> -->
+    
+    <!-- <img src="https://ae01.alicdn.com/kf/HTB1rQC6MxTpK1RjSZR0q6zEwXXaV.jpg" style=""> -->
+
+</div>
+
+
+<!-- Handle Language Change -->
+<script type="text/javascript">
+    // get nodes
+    var $zh = document.querySelector(".zh");
+    var $en = document.querySelector(".en");
+    var $select = document.querySelector("select");
+
+    // bind hashchange event
+    window.addEventListener('hashchange', _render);
+
+    // handle render
+    function _render(){
+        var _hash = window.location.hash;
+        // en
+        if(_hash == "#en"){
+            $select.selectedIndex = 1;
+            $en.style.display = "block";
+            $zh.style.display = "none";
+        // zh by default
+        }else{
+            // not trigger onChange, otherwise cause a loop call.
+            $select.selectedIndex = 0;
+            $zh.style.display = "block";
+            $en.style.display = "none";
+        }
+    }
+
+    // handle select change
+    function onLanChange(index){
+        if(index == 0){
+            window.location.hash = "#zh"
+        }else{
+            window.location.hash = "#en"
+        }
+    }
+
+    // init
+    _render();
+</script>
+
+
+<!-- Gitalk 评论 start  -->
+{% if site.gitalk.enable %}
+<!-- Gitalk link  -->
+<link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css">
+<script src="https://unpkg.com/gitalk@latest/dist/gitalk.min.js"></script>
+
+<div id="gitalk-container"></div>
+    <script type="text/javascript">
+    var gitalk = new Gitalk({
+    clientID: '{{site.gitalk.clientID}}',
+    clientSecret: '{{site.gitalk.clientSecret}}',
+    repo: '{{site.gitalk.repo}}',
+    owner: '{{site.gitalk.owner}}',
+    admin: ['{{site.gitalk.admin}}'],
+    distractionFreeMode: {{site.gitalk.distractionFreeMode}},
+    id: 'about',
+    });
+    gitalk.render('gitalk-container');
+</script>
+{% endif %}
+<!-- Gitalk end -->
+
+ <!-- disqus 评论框 start  -->
+{% if site.disqus.enable %}
+
+<div class="comment">
+    <div id="disqus_thread" class="disqus-thread">
+    </div>
+</div>
+<!-- disqus 评论框 end -->
+
+<!-- disqus 公共JS代码 start (一个网页只需插入一次) -->
+<script type="text/javascript">
+    /* * * CONFIGURATION VARIABLES * * */
+    var disqus_shortname = "{{site.disqus.username}}";
+    var disqus_identifier = "{{site.disqus.username}}/{{page.url}}";
+    var disqus_url = "{{site.url}}{{page.url}}";
+
+    (function() {
+        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+</script>
+<!-- disqus 公共JS代码 end -->
+{% endif %}
+
