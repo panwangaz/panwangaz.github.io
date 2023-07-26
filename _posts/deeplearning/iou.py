@@ -1,7 +1,7 @@
 import torch
 
 
-def boxes_iou_normal(boxes_a, boxes_b):
+def boxes_iou_normal(boxes_a, boxes_b, diou=False):
     """
 
     Args:
@@ -25,6 +25,17 @@ def boxes_iou_normal(boxes_a, boxes_b):
     a_intersect_b = x_len * y_len
     iou = a_intersect_b / torch.clamp_min(
         area_a[:, None] + area_b[None, :] - a_intersect_b, min=1e-6)
+
+    center_a = 0.5 * (boxes_a[:, 2:] + boxes_a[:, :2])
+    center_b = 0.5 * (boxes_b[:, 2:] + boxes_b[:, :2])
+    inter_dist = torch.sum((center_b[:, None, ...] - center_a[None, ...])**2,
+                           dim=-1)
+    outer1 = torch.min(boxes_b[:, None, :2], boxes_a[None, :, :2])
+    outer2 = torch.max(boxes_b[:, None, 2:], boxes_a[None, :, 2:])
+    outer_dist = torch.sum((outer2 - outer1)**2, dim=-1)
+    if diou:
+        return iou - (inter_dist / outer_dist)**2
+
     return iou
 
 
