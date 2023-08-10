@@ -14,6 +14,7 @@ __global__ void matrixMultiply(float* A, float* B, float* C, int n) {
     }
 }
 
+
 int main() {
     float *hA, *hB, *hC;
     float *dA, *dB, *dC;
