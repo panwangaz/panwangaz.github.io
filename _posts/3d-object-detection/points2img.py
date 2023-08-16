@@ -34,9 +34,7 @@ def project_point_cloud_to_image(point_cloud, extrinsic, intrinsic):
 
 def project_pts_on_img(points,
                        raw_img,
-                       lidar2img_rt,
-                       max_distance=70,
-                       thickness=-1):
+                       lidar2img_rt):
     """Project the 3D points cloud on 2D image.
 
     Args:
