@@ -22,12 +22,13 @@ class ASPPConv(nn.Sequential):
 class ASPPPooling(nn.Sequential):
 
     def __init__(self, in_channels, out_channels):
-        super(ASPPPooling, self).__init__(
+        modules = [
             nn.AdaptiveAvgPool2d(1),
             nn.Conv2d(in_channels, out_channels, 1, bias=False),
             nn.BatchNorm2d(out_channels),
             nn.ReLU(inplace=True),
-        )
+        ]
+        super(ASPPPooling, self).__init__(*modules)
 
     def forward(self, x):
         size = x.shape[-2:]

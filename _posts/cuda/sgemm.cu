@@ -1,69 +1,97 @@
-#include <stdio.h>
+#include "cuda_runtime.h"
+#include "device_launch_parameters.h"
+#include <iostream>
+#define BLOCK_WIDTH 16
+using namespace std;
 
-const int N = 1024;
 
-__global__ void matrixMultiply(float* A, float* B, float* C, int n) {
-    int i = blockIdx.x * blockDim.x + threadIdx.x;
-    int j = blockIdx.y * blockDim.y + threadIdx.y;
-    if (i < n && j < n) {
-        float sum = 0.0f;
-        for (int k = 0; k < n; k++) {
-            sum += A[i * n + k] * B[k * n + j];
-        }
-        C[i * n + j] = sum;
-    }
+__global__ void MatrixMulKernel(int m, int n, int k, float *A,float  *B, float *C)
+{
+	int Row=blockIdx.y*blockDim.y+threadIdx.y;
+	int Col=blockIdx.x*blockDim.x+threadIdx.x;
+
+	if((Row<m) && (Col<k))
+	{
+		float cur =0.0;
+		for(int i=0;i<n;++i)
+		     cur += A[Row*n+i]*B[Col+i*k];
+		C[Row*k+Col]= cur;
+	}
 }
 
 
-int main() {
-    float *hA, *hB, *hC;
-    float *dA, *dB, *dC;
-    int size = N * N * sizeof(float);
+__global__ void MatrixMulKernel(int m, int n, int k, float *A,float  *B, float *C)
+{
+	 //申请共享内存，存在于每个block中
+	__shared__ float ds_A[BLOCK_WIDTH][BLOCK_WIDTH];
+	__shared__ float ds_B[BLOCK_WIDTH][BLOCK_WIDTH];
+	//简化坐标记法,出现下面6个表示的地方就是并行的地方。
+	int bx = blockIdx.x, by = blockIdx.y;
+	int tx = threadIdx.x, ty = threadIdx.y;
+	//确定结果矩阵中的行和列
+	int Row = by * BLOCK_WIDTH + ty;
+	int Col = bx * BLOCK_WIDTH + tx;
+	float val = 0;
 
-    // 分配内存并初始化矩阵
-    hA = (float*)malloc(size);
-    hB = (float*)malloc(size);
-    hC = (float*)malloc(size);
-    for (int i = 0; i < N * N; i++) {
-        hA[i] = 1.0f;
-        hB[i] = 2.0f;
-    }
+ 	//循环读入A,B瓦片，计算结果矩阵，分阶段进行计算
+	for (int t=0; t < (n-1) / BLOCK_WIDTH + 1; ++t)
+	{
+		//将A,B矩阵瓦片化的结果放入shared memory中，每个线程加载相应于C元素的A/B矩阵元素
+		if (Row < m && t * BLOCK_WIDTH + tx < n)
+		    ds_A[tx][ty] = A[Row * n + t*BLOCK_WIDTH+tx];
+		else
+			ds_A[tx][ty] = 0.0;
 
-    // 在GPU上分配内存
-    cudaMalloc(&dA, size);
-    cudaMalloc(&dB, size);
-    cudaMalloc(&dC, size);
+		if (t * BLOCK_WIDTH + ty < n && Col < k)
+            ds_B[tx][ty] = B[(t*BLOCK_WIDTH + ty) * k + Col];
+		else
+			ds_B[tx][ty] = 0.0;
 
-    // 将矩阵数据从主机(CPU)内存拷贝到GPU全局内存
-    cudaMemcpy(dA, hA, size, cudaMemcpyHostToDevice);
-    cudaMemcpy(dB, hB, size, cudaMemcpyHostToDevice);
+		__syncthreads();
+		for (int i = 0; i < BLOCK_WIDTH; ++i)
+            val += ds_A[i][ty] * ds_B[tx][i];
 
-    // 设置块(Block)和线程(Thread)的数量
-    dim3 blockSize(16, 16);
-    dim3 gridSize((N + blockSize.x - 1) / blockSize.x, (N + blockSize.y - 1) / blockSize.y);
+		__syncthreads();
+ 		if(Row < m && Col < k)
+			C[Row*k+Col]=val;
+	}
+}
 
-    // 调用CUDA内核函数计算矩阵乘法
-    matrixMultiply<<<gridSize, blockSize>>>(dA, dB, dC, N);
 
-    // 将计算结果从GPU全局内存拷贝回主机(CPU)内存
-    cudaMemcpy(hC, dC, size, cudaMemcpyDeviceToHost);
+int main()
+{
+    float A[6] = { 11.4, 24, 33.5,   45, 55 ,32.4 }; //2×3的矩阵
+	float B[12] = {12,43,22.4, 31.3,  12,324,23,12,  44.4,23.4,65.3,73};//3×4的矩阵
+    float C[8] = { 0 }; //2×4的结果矩阵
+	int m=2,n=3,k=4;
 
-    // 验证计算结果
-    for (int i = 0; i < N * N; i++) {
-        if (hC[i] != 2.0f * N) {
-            printf("Error: incorrect result\n");
-            break;
-        }
-    }
-    printf("Success: correct result\n");
+	int size = sizeof(float);
+	float *d_a;
+	float *d_b;
+	float *d_c;
+	cudaMalloc((void**)&d_a,m*n*size);
+	cudaMalloc((void**)&d_b,n*k*size);
+	cudaMalloc((void**)&d_c,m*k*size);
 
-    // 释放内存
-    free(hA);
-    free(hB);
-    free(hC);
-    cudaFree(dA);
-    cudaFree(dB);
-    cudaFree(dC);
+	cudaMemcpy(d_a, A, size*6, cudaMemcpyHostToDevice);
+	cudaMemcpy(d_b, B, size*12, cudaMemcpyHostToDevice);
+	cudaMemcpy(d_c, C, size*8, cudaMemcpyHostToDevice);
+
+    dim3 dimBlock(BLOCK_WIDTH,BLOCK_WIDTH,1);
+	dim3 dimGrid((k-1)/BLOCK_WIDTH+1,(m-1)/BLOCK_WIDTH+1,1);
+
+	MatrixMulKernel<<<dimGrid,dimBlock>>>(m,n,k,d_a,d_b,d_c);
+
+	cudaMemcpy(C, d_c, size*8, cudaMemcpyDeviceToHost);
+
+    for (int i=0;i<8;i++)
+	{
+		cout<<C[i]<<endl;
+	}
+
+	cudaFree(d_a);
+	cudaFree(d_b);
+	cudaFree(d_c);
 
     return 0;
 }
