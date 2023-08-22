@@ -23,7 +23,7 @@ class ASPPPooling(nn.Sequential):
 
     def __init__(self, in_channels, out_channels):
         modules = [
-            nn.AdaptiveAvgPool2d(1),
+            nn.AdaptiveAvgPool2d((1, 1)),
             nn.Conv2d(in_channels, out_channels, 1, bias=False),
             nn.BatchNorm2d(out_channels),
             nn.ReLU(inplace=True),
@@ -73,3 +73,8 @@ class ASPP(nn.Module):
             res.append(conv(x))
         res = torch.cat(res, dim=1)
         return self.project(res)
+
+
+x = torch.randn((2, 256, 100, 80))
+model = ASPP(256, 512, [4, 6, 8])
+out = model(x)
