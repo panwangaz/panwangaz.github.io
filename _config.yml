@@ -1,17 +1,17 @@
 # Site settings
-title: One Blog
-SEOTitle: One Blog | 文鹃阁
+title: PanWang's Blog
+SEOTitle: One Blog
 header-img: img/green-bg.jpg
-email: yarkable@gmail.com
-description: "Plz go to study now !"
-keyword: "棒棒鸡不棒, One, one, One Blog, 凯, kevin, KevinYe, 文鹃阁"
-url: "https://yarkable.github.io"          # your host, for absolute URL
+email: panwang725@gmail.com
+description: "A CV algorithm engineer whose main research directions focus on autonomous driving, multi-modality, and AIGC"
+keyword: "随笔"
+url: "https://panwangaz.github.io/"          # your host, for absolute URL
 baseurl: ""      # for example, '/blog' if your blog hosted on 'host/blog'
-github_repo: "https://github.com/yarkable/yarkable.github.io.git" # you code repository
+github_repo: "https://github.com/panwangaz/panwangaz.github.io.git" # you code repository
 
 # Sidebar settings
 sidebar: true                           # whether or not using Sidebar.
-sidebar-about-description: "ByteDancer"
+sidebar-about-description: "CSUer & HUSTer, Megvii, Tusimple, Pdd"
 sidebar-avatar: /img/self-introduce.jpg      # use absolute URL, seeing it's used in both `/` and `/about/`
 
 
@@ -20,7 +20,7 @@ sidebar-avatar: /img/self-introduce.jpg      # use absolute URL, seeing it's use
 RSS: false
 # weibo_username:     5532339354
 # zhihu_username:     li-zhi-12-92
-github_username:    yarkable
+github_username:    panwangaz
 # jianshu_username:   5e14129c4ad7
 
 
@@ -62,9 +62,9 @@ gitalk:
   enable: true    #是否开启Gitalk评论
   clientID: 34724aee4f9331859352                            #生成的clientID
   clientSecret: eb79d9acd4dd21ee85de8fde1f1766a6108e8836    #生成的clientSecret
-  repo: yarkable.github.io    #仓库名称
-  owner: yarkable    #github用户名
-  admin: yarkable
+  repo: panwangaz.github.io    #仓库名称
+  owner: panwangaz    #github用户名
+  admin: panwangaz
   distractionFreeMode: true #是否启用类似FB的阴影遮罩
 
 
@@ -97,28 +97,28 @@ service-worker: true
 
 # Friends
 friends: [
-    {
-        title: "萌歪小博客",
-        href: "http://www.moeyy.cn/"
-    },{
-        title: "wyc的Blog",
-        href: "https://wnxbwyc.github.io/"
-    },{
-        title: "小茗",
-        href: "https://chikorita.fun/"
-    },{
-        title: "小白",
-        href: "https://wulidecade.cn/"
-    },{
-        title: "阿鹏",
-        href: "https://apeng.fun/"
-    },{
-        title: "PRIN",
-        href: "https://printempw.github.io/"
-    },{
-        title: "JosonChan",
-        href: "https://josonchan1998.github.io/"
-    }
+    # {
+    #     title: "萌歪小博客",
+    #     href: "http://www.moeyy.cn/"
+    # },{
+    #     title: "wyc的Blog",
+    #     href: "https://wnxbwyc.github.io/"
+    # },{
+    #     title: "小茗",
+    #     href: "https://chikorita.fun/"
+    # },{
+    #     title: "小白",
+    #     href: "https://wulidecade.cn/"
+    # },{
+    #     title: "阿鹏",
+    #     href: "https://apeng.fun/"
+    # },{
+    #     title: "PRIN",
+    #     href: "https://printempw.github.io/"
+    # },{
+    #     title: "JosonChan",
+    #     href: "https://josonchan1998.github.io/"
+    # }
 ]
 
 # markdown LaTeX
